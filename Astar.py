@@ -3,7 +3,7 @@ import cv2
 import math
 import obstacle_map
 import time
-from Queue import PriorityQueue
+from queue import PriorityQueue
 
 def load_map(fname = None):
 	if fname is not None :
@@ -52,14 +52,14 @@ def getStartNode(map_):
 		## Cartesian Form
 		x = int(input("x_intial is: "))
 		y = int(input("y_intial is: "))
-		theta = int(input("theta_intial is (in degree): "))/30
+		theta = int(int(input("theta_intial is (in degree): "))/30)
 		## image coordinates
 		row = rows-y-1 ; col = x
 		if not isValidNode(map_, row, col,0):
 			print('Input Node not within available map range. Please enter again!')
 		else:
 			break;
-	return (row, col)
+	return (row, col,theta)
 
 def getGoalNode(map_):
 	print("Enter the goal co-ordinates")
@@ -97,7 +97,7 @@ def updateNeighbours(arr, map_, curr_node,queue,visited,goal_node,step_size=2,th
 		y_new = y + step_size*math.sin(theta_new)
 		y_new = int(round(y_new)/0.5)
 		theta_new = theta_new/theta_size
-		if isValidNode(map_,x_new,y_new,theta_new,0) and not visited[x_new][y_new][theta_new]:
+		if isValidNode(map_,x_new,y_new,0) and not visited[x_new][y_new][theta_new]:
 			arr[x_new][y_new] = arr[x][y].cost + euclideanDistance((x_new,y_new),goal_node)
 			queue.put((arr[x_new][y_new].cost,(x_new,y_new,theta_new)))
 			arr[x_new][y_new].parent = (x,y)
@@ -155,7 +155,7 @@ def main():
 	img[goal_node[0]][goal_node[1]] = (0,0,255)
 	while queue:
 		curr_node = queue.get()[1]
-		if (curr_node[:2] == goal_node[:2]):
+		if (curr_node[:2] == goal_node):
 			algo_time = time.time()
 			print('found Goal in {}s at cost {}!!'.format(algo_time-start_time, arr[goal_node[0]][goal_node[1]].cost))
 			tracePath(arr,map_,goal_node)
