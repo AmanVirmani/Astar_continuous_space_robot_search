@@ -56,7 +56,7 @@ def euclideanDistance(state1, state2):
 
 #input start coordinates, theta, radius, and clearance
 def getStartNode(map_):
-    print("Enter the start co-ordinates")
+    print("Enter the start coordinates")
     rows, cols= map_.shape[:2]
     while True :
         ## Cartesian Form
@@ -74,7 +74,7 @@ def getStartNode(map_):
 
 #input goal coordinates
 def getGoalNode(map_):
-    print("Enter the goal co-ordinates")
+    print("Enter the goal coordinates")
     rows, cols= map_.shape[:2]
     while True:
         ## Cartesian Form
@@ -180,7 +180,7 @@ def main():
     # step_size = int(input("step size is: "))
 
 
-    step_size = 5
+    step_size = 1
     goal_node = getGoalNode(img)
     threshold = .5
     step_size = step_size*2
