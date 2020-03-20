@@ -1,4 +1,5 @@
 import obstacle_map
+import matplotlib.pyplot as plt
 import numpy as np
 import time
 import math
@@ -17,7 +18,7 @@ def load_map(fname = None):
     obstacle_map.obstacle_rectangle(world)
     obstacle_map.obstacle_polygon(world)
 
-    cv2.imwrite('./map.jpg',world)
+    cv2.imwrite('./outputs/map.jpg',world)
     return world
 
 
@@ -71,9 +72,9 @@ def getGoalNode(map_):
     rows, cols= map_.shape[:2]
     while True:
         ## Cartesian Form
-        # x = int(input("x_goal is: "))
-        # y = int(input("y_goal is: "))
-        x, y = 100, 100
+        x = int(input("x_goal is: "))
+        y = int(input("y_goal is: "))
+        #x, y = 190, 190
         ## image coordinates
         row = rows-2*y-1 ; col = 2*x
         if not isValidNode(map_, row, col, 0, 0):
@@ -100,50 +101,42 @@ def updateNeighbours(arr, map_, curr_node,queue,goal_node,step_size):
     
     for angle in range(0, 12,1):
         theta_new = (theta+angle)%12
-        x_new = int(x + step_size*math.cos(theta_new*theta_size))
+        x_new = round(x + step_size*math.cos(theta_new*theta_size))
         # x_new = round(x_new/threshold)
-        y_new = int(y + step_size*math.sin(theta_new*theta_size))
+        y_new = round(y + step_size*math.sin(theta_new*theta_size))
         # y_new = round(y_new/threshold)
         if isValidNode(map_,x_new,y_new,theta_new, 0):
-            #check if visited
-            not_visited = True
-            for i in range(-1,2):
-                for j in range(-1,2):
-                    if isValidNode(map_,x_new+i,y_new+j,theta_new, 0) and arr[x_new+i][y_new+j][theta_new].visited is True:
-                        not_visited = False
-
             arr[x_new][y_new][theta_new].costCome = arr[x][y][theta].costCome + euclideanDistance((x_new,y_new),(x,y))
             arr[x_new][y_new][theta_new].cost = arr[x_new][y_new][theta_new].costCome + euclideanDistance((x_new,y_new),goal_node)
-            if not_visited is True:
+            #check if visited
+            if arr[x_new][y_new][theta_new].visited is False:
                 arr[x_new][y_new][theta_new].visited = True
                 queue.put((arr[x_new][y_new][theta_new].cost,(x_new,y_new,theta_new)))
                 arr[x_new][y_new][theta_new].parent = (x,y,theta)
+                cv2.line(map_, (y_new,x_new), (y, x), (0, 255, 0), thickness=1, lineType=8)
             else:
                 if arr[x_new][y_new][theta_new].cost > arr[x][y][theta].costCome + euclideanDistance((x_new,y_new),(x,y)) + euclideanDistance((x_new,y_new),goal_node):
                     queue.put((arr[x_new][y_new][theta_new].cost,(x_new,y_new,theta_new)))
                     arr[x_new][y_new][theta_new].parent = (x,y,theta)
+    return arr, map_
 
-    return arr
 
-
-def tracePath(arr,map_,goal_node):
+def tracePath(arr,img,curr_node):
     images= []
-    output = './output.avi'
-    curr_node = goal_node
-    img = map_.copy()
+    output = './outputs/output.avi'
     while curr_node is not None:
-        img[curr_node[0]][curr_node[1]] = (0,0,255)
-        images.append(img)
-        img[curr_node[0]][curr_node[1]] = (0,0,0)
-        curr_node = arr[curr_node[0]][curr_node[1]].parent
-
-    images = images[::-1]
-    saveVideo(images,output)
-
+        img[curr_node[0]][curr_node[1]] = (0,255,0)
+        old_node = curr_node
+        curr_node = arr[curr_node[0]][curr_node[1]][curr_node[2]].parent
+        if curr_node is not None:
+            cv2.line(img, (old_node[1],old_node[0]), (curr_node[1],curr_node[0]), (0, 0, 255), thickness=1, lineType=8)
+        
+    return img
+    
 def saveVideo(images,output='path.avi'):
     h,w = images[0].shape[:2]
     out = cv2.VideoWriter(output,cv2.VideoWriter_fourcc('M','J','P','G'), 1, (w,h))
-    images= np.uint8(images)
+    images = np.uint8(images)
     for img in images:
         cv2.imshow('path traced',img)
         cv2.waitKey(10)
@@ -167,7 +160,8 @@ def main():
 
     start_node = getStartNode(img)
     # step_size = int(input("step size is: "))
-    step_size = 5
+
+    step_size = 1
     goal_node = getGoalNode(img)
     threshold = .5
     step_size = step_size*2
@@ -186,19 +180,24 @@ def main():
     img[goal_node[0]][goal_node[1]] = (0,0,255)
     while queue:
         curr_node = queue.get()[1]
-        if euclideanDistance(curr_node[:2],goal_node) < 10:
+        if euclideanDistance(curr_node[:2],goal_node) < 3:
             algo_time = time.time()
             print('found Goal in {}s at cost {}!!'.format(algo_time-start_time, arr[curr_node[0]][curr_node[1]][curr_node[2]].cost))
-            #tracePath(arr,map_,goal_node)
+            output = tracePath(arr,img,curr_node)
             break
-        arr = updateNeighbours(arr, img, curr_node,queue,goal_node,step_size)
-        img[curr_node[0]][curr_node[1]] = (0,255,0)
+        arr, img = updateNeighbours(arr, img, curr_node,queue,goal_node,step_size)
+        #img[curr_node[0]][curr_node[1]] = (0,255,0)
         #exploredList.append(img)
-        cv2.imshow('explored', img)
         key = cv2.waitKey(1) & 0xFF
         if key == 27 or key == ord("q"):
             break
-    #saveVideo(exploredList,'explored.avi')
+
+    cv2.imshow('Output', output)
+    cv2.imshow('Output with Branches', img)
+    cv2.imwrite('./outputs/Path.jpg',output)
+    cv2.imwrite('./outputs/Explored.jpg',img
+                )
+    #saveVideo(exploredList,'./outputs/explored.avi')
     cv2.destroyAllWindows()
 
 if __name__=='__main__':
