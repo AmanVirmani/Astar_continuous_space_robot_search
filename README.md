@@ -10,7 +10,7 @@ pip install numpy
 ```
 
 ## Instructions to search goal using Astar algorithm for a Rigid Robot
-```python
+```bash
 git clone https://github.com/AmanVirmani/Astar_continuous_space_robot_search.git
 python Astar_rigid.py
 ```
