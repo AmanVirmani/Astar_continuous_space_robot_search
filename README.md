@@ -11,7 +11,7 @@ pip install numpy
 
 ## Instructions to run Dijkstra for a Rigid Robot
 ```python
-$ git clone 
+$ git clone https://github.com/AmanVirmani/Astar_continuous_space_robot_search.git
 $ python codes\Dijkstra_point.py
 ```
 The user will then be prompted to enter the start position in the cartesian coordinates, the start angle in degrees (0 is straigt down and it goes counterclockwise), the radius of the robot, the clearance, and finally the goal coordinates. Once the program finishes, the optimal path to the goal is displayed. Consider the example below.
