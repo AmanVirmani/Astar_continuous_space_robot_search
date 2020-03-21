@@ -32,4 +32,4 @@ found Goal in 3246s
 ## Execution time for the Algorithm (Point Robot)
 The file `explored.avi` shows the animation for the exploration of the search space.
 
-The file `output.avi` shows the animation for the optimal path after the exploration.
+The file `outputs/output.avi` shows the animation for the optimal path after the exploration.
