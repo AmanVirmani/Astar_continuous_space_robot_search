@@ -68,7 +68,7 @@ def getStartNode(map_,radius):
         x = int(input("x_intial is: "))
         y = int(input("y_intial is: "))
         theta = int(int(input("theta_intial is (in degree): "))/30)
-        # x, y, theta = (50, 50, 2)
+        # x, y, theta = (50, 30, 2)
 
         # converting to image coordinates
         row = rows-2*y-1 ; col = 2*x
@@ -192,7 +192,6 @@ def main():
 
     path_img = cv2.circle(path_img, (start_node[1], start_node[0]), r+c, (0,0,0), 2)
     path_img = cv2.circle(path_img, (goal_node[1], goal_node[0]), r+c, (0,0,0), 2)
-    #img[goal_node[0]][goal_node[1]] = (0, 0, 255)
     while queue:
         curr_node = queue.get()[1]
         if euclideanDistance(curr_node[:2], goal_node) < 3:
