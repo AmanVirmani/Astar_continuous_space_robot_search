@@ -68,6 +68,9 @@ def getStartNode(map_,radius):
         x = int(input("x_intial is: "))
         y = int(input("y_intial is: "))
         theta = int(int(input("theta_intial is (in degree): "))/30)
+        theta -= 3
+        if theta < 0:
+            theta += 12
         # x, y, theta = (50, 30, 2)
 
         # converting to image coordinates
