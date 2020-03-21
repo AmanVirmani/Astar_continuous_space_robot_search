@@ -30,6 +30,6 @@ found Goal in 3246s
 ```
 
 ## Execution time for the Algorithm (Point Robot)
-The file `explored.avi` shows the animation for the exploration of the search space.
+It took 3246s for the code to run given the inputs above.
 
 The file `outputs/output.avi` shows the animation for the optimal path after the exploration.
