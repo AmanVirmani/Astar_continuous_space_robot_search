@@ -60,7 +60,7 @@ def euclideanDistance(state1, state2):
 
 
 # Function to take user input start coordinates, theta, radius, and clearance
-def getStartNode(map_):
+def getStartNode(map_,radius):
     print("Enter the start coordinates")
     rows, cols = map_.shape[:2]
     while True :
@@ -68,11 +68,11 @@ def getStartNode(map_):
         x = int(input("x_intial is: "))
         y = int(input("y_intial is: "))
         theta = int(int(input("theta_intial is (in degree): "))/30)
-        #x, y, theta = (50, 50, 2)
+        # x, y, theta = (50, 50, 2)
 
         # converting to image coordinates
         row = rows-2*y-1 ; col = 2*x
-        if not isValidNode(map_, row, col,0):
+        if not isValidNode(map_, row, col, theta, radius):
             print('Input Node not within available map range. Please enter again!')
         else:
             break
@@ -80,7 +80,7 @@ def getStartNode(map_):
 
 
 # Function to take user input goal coordinates
-def getGoalNode(map_):
+def getGoalNode(map_,radius):
     print("Enter the goal coordinates")
     rows, cols= map_.shape[:2]
     while True:
@@ -90,7 +90,7 @@ def getGoalNode(map_):
         #x, y = 150, 150
         # image coordinates
         row = rows-2*y-1 ; col = 2*x
-        if not isValidNode(map_, row, col, 0, 0):
+        if not isValidNode(map_, row, col, 0, radius):
             print('Input Node not within available map range. Please enter again! ')
         else:
             break
@@ -112,7 +112,7 @@ class Node:
 
 
 # Function to append valid neighbours of the current node in the search tree
-def updateNeighbours(arr, map_, path_img, curr_node, queue, goal_node, step_size):
+def updateNeighbours(arr, map_, path_img, curr_node, queue, goal_node, step_size, radius):
     x, y, theta = curr_node
     theta_size = 30
     # iterate for each of the five directions it can go
@@ -124,7 +124,7 @@ def updateNeighbours(arr, map_, path_img, curr_node, queue, goal_node, step_size
             theta_new += 12
         x_new = round(x + step_size*math.sin(math.radians(theta_new*theta_size)))
         y_new = round(y + step_size*math.cos(math.radians(theta_new*theta_size)))
-        if isValidNode(map_,x_new,y_new,theta_new, 0):
+        if isValidNode(map_,x_new,y_new,theta_new, radius):
             # calculate the cost to come for the new node
             arr[x_new][y_new][theta_new].costCome = arr[x][y][theta].costCome + euclideanDistance((x_new,y_new),(x,y))
             # calculate the total cost for the new node
@@ -169,10 +169,12 @@ def main():
     img = cv2.resize(img,(600,400))
     path_img = img.copy()
 
-    start_node = getStartNode(img)
+    r = int(input("Robot's radius is: "))
+    c = int(input("Desired clearance is: "))
+    start_node = getStartNode(img,r+c)
     step_size = int(input("step size is: "))
 
-    goal_node = getGoalNode(img)
+    goal_node = getGoalNode(img,r+c)
     step_size = step_size*2
     rows, cols = map_.shape[:2]
 
@@ -188,7 +190,9 @@ def main():
     out = cv2.VideoWriter(output, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 1, (w, h))
     start_time = time.time()
 
-    img[goal_node[0]][goal_node[1]] = (0, 0, 255)
+    path_img = cv2.circle(path_img, (start_node[1], start_node[0]), r+c, (0,0,0), 2)
+    path_img = cv2.circle(path_img, (goal_node[1], goal_node[0]), r+c, (0,0,0), 2)
+    #img[goal_node[0]][goal_node[1]] = (0, 0, 255)
     while queue:
         curr_node = queue.get()[1]
         if euclideanDistance(curr_node[:2], goal_node) < 3:
@@ -196,7 +200,7 @@ def main():
             print('found Goal in {}s at cost {}!!'.format(algo_time-start_time, arr[curr_node[0]][curr_node[1]][curr_node[2]].cost))
             tracePath(arr, path_img, curr_node)
             break
-        arr, img, path_img = updateNeighbours(arr, img, path_img, curr_node, queue, goal_node, step_size)
+        arr, img, path_img = updateNeighbours(arr, img, path_img, curr_node, queue, goal_node, step_size,r+c)
         out.write(np.uint8(path_img))
         cv2.imshow('process', path_img)
         key = cv2.waitKey(1) & 0xFF
