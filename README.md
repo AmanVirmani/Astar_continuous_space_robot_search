@@ -1,7 +1,6 @@
 # ENPM661_Proj3_Phase2
 A* implementation for Rigid Robot
 
-The main file are main.py
 
 ## Installation
 ```bash
