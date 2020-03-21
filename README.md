@@ -26,6 +26,7 @@ step size is: 1
 Enter the goal coordinates
 x_goal is: 150
 y_goal is: 150
+found Goal in 3246s
 ```
 
 ## Execution time for the Algorithm (Point Robot)
