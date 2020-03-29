@@ -34,6 +34,6 @@ git clone https://github.com/AmanVirmani/Astar_continuous_space_robot_search.git
 python main.py
 ```
 
-## Execution time for the Algorithm (Point Robot)
+## Output
 
 The file `outputs/output.gif` shows the animation for the optimal path after the exploration.
