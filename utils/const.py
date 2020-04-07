@@ -15,7 +15,7 @@ total_angle = 360
 # Define exploration constants
 no_parent = -1
 node_generated = 1
-start_parent = -99
+default_base_cost = float("inf")
 
 # Define heuristic function
 heuristic = "euclidean"
