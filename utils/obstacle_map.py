@@ -2,8 +2,26 @@
 import numpy as np
 import cv2
 from math import *
+from utils import const
 
 rc = 0
+
+
+def erode_image(map_, rc):
+    """
+    Get eroded image to check for obstacles considering the robot radius and clearance
+    :return: image with obstacle space expanded to distance threshold between robot and obstacle
+    """
+    # Erode map image for rigid robot
+    if rc:
+        kernel_size = (const.scaling_factor*rc*2) + 1
+        erode_kernel = np.ones((kernel_size, kernel_size), np.uint8)
+        eroded_img = cv2.erode(map_.copy(), erode_kernel, iterations=1)
+        return eroded_img
+    else:
+        return map_
+
+
 def findLine(pt1,pt2):
   m = (pt2[1]-pt1[1])/(pt2[0]-pt1[0])
   c = pt1[1]-m*pt1[0]
