@@ -5,6 +5,7 @@ import cv2
 import imageio
 import time
 
+
 class PathPlanning:
 
     def __init__(self,start_node, goal_node, step_size, step_theta):
@@ -47,6 +48,7 @@ class PathPlanning:
             return False
 
     def Astar(self, map_):
+
         start_time = time.time()
         explore_queue = PriorityQueue()
         explore_queue.put((self.get_cost(self.start_node, None), self.start_node))
@@ -76,7 +78,7 @@ class PathPlanning:
     def find_optimal_path(self, img, curr_node):
         nodes = []
         images = []
-        output = '../outputs/output.gif'
+        output = './outputs/output.gif'
         while self.parent[curr_node[0]][curr_node[1]][curr_node[2]] != const.no_parent:
             nodes.append(curr_node)
             curr_node = np.unravel_index(self.parent[curr_node[0]][curr_node[1]][curr_node[2]], dims=self.map_size)
@@ -87,14 +89,16 @@ class PathPlanning:
             images.append(np.uint8(img.copy()))
         imageio.mimsave(output, images, fps=55)
 
+
 def cartesian_to_img(map_, node):
     rows, cols, ch = map_.shape
     x = const.scaling_factor*node[0]
     y = rows - const.scaling_factor*node[1] - 1
-    if  0< x < cols and 0 < y < rows and (map_[y][x] == [255,255,255]).all():
+    if  0< x < cols and 0 < y < rows and (map_[y][x] == [255, 255, 255]).all():
         return y, x, node[2]
     else:
         return None
+
 
 if __name__=='__main__':
     map_ = cv2.imread('../map.jpg')
