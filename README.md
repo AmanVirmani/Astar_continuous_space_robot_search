@@ -31,7 +31,7 @@ Run the following command to do path planning for a rigid robot using A* algorit
 
 ```bash
 git clone https://github.com/AmanVirmani/Astar_continuous_space_robot_search.git
-python main.py
+python main.py -s <start_node> -g <goal_node>
 ```
 
 ## Output
