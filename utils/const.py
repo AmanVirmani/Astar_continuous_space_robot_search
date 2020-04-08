@@ -3,7 +3,7 @@
 dist_thresh = 0.5
 scaling_factor = int(1 / dist_thresh)
 # Define threshold around goal
-goal_thresh = int(scaling_factor * 1.5)
+goal_thresh = int(scaling_factor * 5.5)
 # Define map size
 width, height = 300, 200
 map_size = (scaling_factor * height), (scaling_factor * width)

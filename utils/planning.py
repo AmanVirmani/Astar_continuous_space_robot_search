@@ -3,6 +3,7 @@ from utils import const
 from queue import PriorityQueue
 import cv2
 import imageio
+import time
 
 class PathPlanning:
 
@@ -13,9 +14,6 @@ class PathPlanning:
         self.step_size = step_size
         # Store map dimensions
         self.map_size = const.map_size[0], const.map_size[1], (const.total_angle // step_theta)
-        # Define an empty list to store all generated nodes and path nodes
-        self.generated_nodes = []
-        self.path_nodes = []
         # Define 3-D arrays to store information about generated nodes and parent nodes
         self.parent = np.full(fill_value=const.no_parent, shape=self.map_size)
         # Define a 3-D array to store base cost of each node
@@ -49,25 +47,26 @@ class PathPlanning:
             return False
 
     def Astar(self, map_):
+        start_time = time.time()
         explore_queue = PriorityQueue()
         explore_queue.put((self.get_cost(self.start_node, None), self.start_node))
         img = cv2.circle(map_, (self.start_node[1], self.start_node[0]), 3, [0, 0, 0], -1)
         img = cv2.circle(img, (self.goal_node[1], self.goal_node[0]), 3, [0, 0, 0],  -1)
-        cv2.imshow('curr', map_); cv2.waitKey(0); cv2.destroyAllWindows()
+        #cv2.imshow('curr', map_); cv2.waitKey(0); cv2.destroyAllWindows()
 
         while explore_queue:
             curr_node = explore_queue.get()[1]
             if self.get_cost2go(curr_node) < const.goal_thresh:
-                # TODO: write a traceback method
+                print("Found goal in {}s".format(time.time()-start_time))
                 self.find_optimal_path(img, curr_node)
-                print("Found goal")
+                break
 
             for action in range(const.max_actions):
                 child_node = self.get_child_node(curr_node, action)
                 if self.is_valid(map_, child_node) and self.get_cost2come(curr_node, child_node) \
                     < self.base_cost[child_node[0]][child_node[1]][child_node[2]]:
                     img[child_node[0]][child_node[1]] = [0, 255, 0]
-                    cv2.imshow('curr', map_); cv2.waitKey(1)#; cv2.destroyAllWindows()
+                    #cv2.imshow('curr', map_); cv2.waitKey(1)#; cv2.destroyAllWindows()
                     self.base_cost[child_node[0]][child_node[1]][child_node[2]] = \
                         self.get_cost2come(curr_node, child_node)
                     explore_queue.put((self.get_cost(curr_node, child_node), child_node))
@@ -77,10 +76,10 @@ class PathPlanning:
     def find_optimal_path(self, img, curr_node):
         nodes = []
         images = []
-        output = './outputs/output.gif'
-        while self.parent[curr_node[0]][curr_node[1]][curr_node[2]] is not const.no_parent:
+        output = '../outputs/output.gif'
+        while self.parent[curr_node[0]][curr_node[1]][curr_node[2]] != const.no_parent:
             nodes.append(curr_node)
-            curr_node = self.parent[curr_node[0]][curr_node[1]][curr_node[2]]
+            curr_node = np.unravel_index(self.parent[curr_node[0]][curr_node[1]][curr_node[2]], dims=self.map_size)
         nodes = nodes[::-1]
 
         for i in range(len(nodes)-1):
